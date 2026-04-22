@@ -394,7 +394,7 @@ const heimanExtend = {
             e
                 .text("cell_mounted_table", ea.ALL)
                 .withDescription(
-                    "Ceiling installation area coordinate table. Format: 'X1,X2,Y1,Y2,height'. Value range: -2000≤X1≤0, 0≤X2≤2000 -2500≤Y1≤0, 0≤Y2≤2500 2300≤height≤3000 Unit:mm",
+                    "Ceiling installation area coordinate table. Format: 'X1,X2,Y1,Y2,height'. Value range: -2000��X1��0, 0��X2��2000 -2500��Y1��0, 0��Y2��2500 2300��height��3000 Unit:mm",
                 ),
         );
         const fromZigbee = [
@@ -474,7 +474,7 @@ const heimanExtend = {
             e
                 .text("wall_mounted_table", ea.ALL)
                 .withDescription(
-                    "Wall-mounted installation area coordinate table. Format: 'X1,X2,Y2,height' Value range: -2000≤X1≤0, 0≤X2≤2000 200≤Y2≤4000 1500≤height≤1600  Unit:mm.",
+                    "Wall-mounted installation area coordinate table. Format: 'X1,X2,Y2,height' Value range: -2000��X1��0, 0��X2��2000 200��Y2��4000 1500��height��1600  Unit:mm.",
                 ),
         );
         const fromZigbee = [
@@ -549,7 +549,7 @@ const heimanExtend = {
             e
                 .text("sub_region_isolation_table", ea.ALL)
                 .withDescription(
-                    "Undetectable area coordinate table. Format: 'x1,x2,y1,y2,z1,z2'. Ranges: X1≤x1≤x2≤X2 When wall-mounted:  200≤y1≤y2≤Y2 0≤z1≤z2≤2300 Ceiling installation: Y1≤y1≤y2≤Y2 0≤z1≤z2≤height Unit:mm",
+                    "Undetectable area coordinate table. Format: 'x1,x2,y1,y2,z1,z2'. Ranges: X1��x1��x2��X2 When wall-mounted:  200��y1��y2��Y2 0��z1��z2��2300 Ceiling installation: Y1��y1��y2��Y2 0��z1��z2��height Unit:mm",
                 ),
         );
         const fromZigbee = [
@@ -1223,27 +1223,6 @@ const heimanExtend = {
                 .withFeature(e.numeric("range", ea.ALL).withUnit("cm").withDescription("Detection range"))
                 .withFeature(e.numeric("period", ea.ALL).withUnit("ms").withDescription("Detection period")),
         );
-    heimanClusterSensorWifiExposure: (): ModernExtend => {
-        const clusterName = "heimanClusterSpecial" as const;
-
-        const attrIds: Record<string, number> = {
-            wifiSsid: 0x0001,
-            wifiPassword: 0x0002,
-            wifiSsidCandidate: 0x0003,
-            wifiPasswordCandidate: 0x0004,
-            serverUrl: 0x0005,
-            serverUrlCandidate: 0x0006,
-        };
-
-        const exposes = [
-            e.text("wifi_ssid", ea.ALL).withDescription("Current WiFi SSID"),
-            e.text("wifi_password", ea.ALL).withDescription("Current WiFi Password"),
-            e.text("wifi_ssid_candidate", ea.ALL).withDescription("Candidate WiFi SSID"),
-            e.text("wifi_password_candidate", ea.ALL).withDescription("Candidate WiFi Password"),
-            e.text("server_url", ea.ALL).withDescription("Current Server URL"),
-            e.text("server_url_candidate", ea.ALL).withDescription("Candidate WiFi Server URL"),
-        ];
-
         const fromZigbee = [
             {
                 cluster: clusterName,
@@ -1319,67 +1298,6 @@ const heimanExtend = {
                 },
             },
         ];
-                    const result: Record<string, unknown> = {};
-                    const data = msg.data as Record<string, unknown>;
-
-                    if (data.wifiSsid !== undefined) result.wifi_ssid = data.wifiSsid;
-                    if (data.wifiPassword !== undefined) result.wifi_password = data.wifiPassword;
-                    if (data.wifiSsidCandidate !== undefined) result.wifi_ssid_candidate = data.wifiSsidCandidate;
-                    if (data.wifiPasswordCandidate !== undefined) result.wifi_password_candidate = data.wifiPasswordCandidate;
-                    if (data.serverUrl !== undefined) result.server_url = data.serverUrl;
-                    if (data.serverUrlCandidate !== undefined) result.server_url_candidate = data.serverUrlCandidate;
-
-                    return result;
-                },
-            } satisfies Fz.Converter<typeof clusterName, HeimanPrivateCluster, ["attributeReport", "readResponse"]>,
-        ];
-
-        const toZigbee: Tz.Converter[] = [
-            {
-                key: ["wifi_ssid", "wifi_password", "wifi_ssid_candidate", "wifi_password_candidate", "server_url", "server_url_candidate"],
-                convertSet: async (entity, key, value, meta) => {
-                    const attrNameMap: Record<string, string> = {
-                        wifi_ssid: "wifiSsid",
-                        wifi_password: "wifiPassword",
-                        wifi_ssid_candidate: "wifiSsidCandidate",
-                        wifi_password_candidate: "wifiPasswordCandidate",
-                        server_url: "serverUrl",
-                        server_url_candidate: "serverUrlCandidate",
-                    };
-
-                    const attrName = attrNameMap[key];
-                    const attrId = attrIds[attrName];
-
-                    if (attrId !== undefined) {
-                        const payload = {
-                            [attrId]: {
-                                value: value,
-                                type: Zcl.DataType.CHAR_STR,
-                            },
-                        };
-                        await entity.write(clusterName, payload, defaultResponseOptions);
-                        // await entity.write<typeof clusterName, HeimanPrivateCluster>(clusterName, {[attrId]: value}, defaultResponseOptions);
-                    }
-                    return {state: {[key]: value}};
-                },
-                convertGet: async (entity, key, meta) => {
-                    const attrNameMap: Record<string, string> = {
-                        wifi_ssid: "wifiSsid",
-                        wifi_password: "wifiPassword",
-                        wifi_ssid_candidate: "wifiSsidCandidate",
-                        wifi_password_candidate: "wifiPasswordCandidate",
-                        server_url: "serverUrl",
-                        server_url_candidate: "serverUrlCandidate",
-                    };
-
-                    const attrId = attrIds[attrNameMap[key]];
-                    if (attrId !== undefined) {
-                        await entity.read(clusterName, [attrId], defaultResponseOptions);
-                    }
-                },
-            },
-        ];
-
         return {
             exposes,
             fromZigbee,
@@ -1490,26 +1408,6 @@ const heimanExtend = {
         return {
             exposes: exposes,
             fromZigbee,
-    heimanClusterSensorActiveTrigger: (): ModernExtend => {
-        const clusterName = "heimanClusterSpecial" as const;
-        const manufacturerCode = 0x120b;
-
-        const exposes = [e.enum("camera_active_trigger", ea.SET, ["active"]).withDescription("Trigger the camera to take a picture.")];
-
-        const toZigbee: Tz.Converter[] = [
-            {
-                key: ["camera_active_trigger"],
-                convertSet: async (entity, key, value, meta) => {
-                    // Command ID 0x01: CameraActiveTigger
-                    await entity.command(clusterName, 0x01, {}, {manufacturerCode});
-                    return {state: {[key]: value}};
-                },
-            },
-        ];
-
-        return {
-            exposes,
-            fromZigbee: [],
             toZigbee,
             isModernExtend: true,
         };
@@ -1554,6 +1452,120 @@ const heimanExtend = {
         return {
             ...mExtend,
             fromZigbee,
+        };
+    },
+    heimanClusterSensorWifiExposure: (): ModernExtend => {
+        const clusterName = "heimanClusterSpecial" as const;
+
+        const attrIds: Record<string, number> = {
+            wifiSsid: 0x0001,
+            wifiPassword: 0x0002,
+            wifiSsidCandidate: 0x0003,
+            wifiPasswordCandidate: 0x0004,
+            serverUrl: 0x0005,
+            serverUrlCandidate: 0x0006,
+        };
+
+        const exposes = [
+            e.text("wifi_ssid", ea.ALL).withDescription("Current WiFi SSID"),
+            e.text("wifi_password", ea.ALL).withDescription("Current WiFi Password"),
+            e.text("wifi_ssid_candidate", ea.ALL).withDescription("Candidate WiFi SSID"),
+            e.text("wifi_password_candidate", ea.ALL).withDescription("Candidate WiFi Password"),
+            e.text("server_url", ea.ALL).withDescription("Current Server URL"),
+            e.text("server_url_candidate", ea.ALL).withDescription("Candidate WiFi Server URL"),
+        ];
+                    const result: Record<string, unknown> = {};
+                    const data = msg.data as Record<string, unknown>;
+
+                    if (data.wifiSsid !== undefined) result.wifi_ssid = data.wifiSsid;
+                    if (data.wifiPassword !== undefined) result.wifi_password = data.wifiPassword;
+                    if (data.wifiSsidCandidate !== undefined) result.wifi_ssid_candidate = data.wifiSsidCandidate;
+                    if (data.wifiPasswordCandidate !== undefined) result.wifi_password_candidate = data.wifiPasswordCandidate;
+                    if (data.serverUrl !== undefined) result.server_url = data.serverUrl;
+                    if (data.serverUrlCandidate !== undefined) result.server_url_candidate = data.serverUrlCandidate;
+
+                    return result;
+                },
+            } satisfies Fz.Converter<typeof clusterName, HeimanPrivateCluster, ["attributeReport", "readResponse"]>,
+        ];
+
+        const toZigbee: Tz.Converter[] = [
+            {
+                key: ["wifi_ssid", "wifi_password", "wifi_ssid_candidate", "wifi_password_candidate", "server_url", "server_url_candidate"],
+                convertSet: async (entity, key, value, meta) => {
+                    const attrNameMap: Record<string, string> = {
+                        wifi_ssid: "wifiSsid",
+                        wifi_password: "wifiPassword",
+                        wifi_ssid_candidate: "wifiSsidCandidate",
+                        wifi_password_candidate: "wifiPasswordCandidate",
+                        server_url: "serverUrl",
+                        server_url_candidate: "serverUrlCandidate",
+                    };
+
+                    const attrName = attrNameMap[key];
+                    const attrId = attrIds[attrName];
+
+                    if (attrId !== undefined) {
+                        const payload = {
+                            [attrId]: {
+                                value: value,
+                                type: Zcl.DataType.CHAR_STR,
+                            },
+                        };
+                        await entity.write(clusterName, payload, defaultResponseOptions);
+                        // await entity.write<typeof clusterName, HeimanPrivateCluster>(clusterName, {[attrId]: value}, defaultResponseOptions);
+                    }
+                    return {state: {[key]: value}};
+                },
+                convertGet: async (entity, key, meta) => {
+                    const attrNameMap: Record<string, string> = {
+                        wifi_ssid: "wifiSsid",
+                        wifi_password: "wifiPassword",
+                        wifi_ssid_candidate: "wifiSsidCandidate",
+                        wifi_password_candidate: "wifiPasswordCandidate",
+                        server_url: "serverUrl",
+                        server_url_candidate: "serverUrlCandidate",
+                    };
+
+                    const attrId = attrIds[attrNameMap[key]];
+                    if (attrId !== undefined) {
+                        await entity.read(clusterName, [attrId], defaultResponseOptions);
+                    }
+                },
+            },
+        ];
+
+        return {
+            exposes,
+            fromZigbee,
+            toZigbee,
+            isModernExtend: true,
+        };
+    },
+    heimanClusterSensorActiveTrigger: (): ModernExtend => {
+        const clusterName = "heimanClusterSpecial" as const;
+        const manufacturerCode = 0x120b;
+
+        const exposes = [e.enum("camera_active_trigger", ea.SET, ["active"]).withDescription("Trigger the camera to take a picture.")];
+
+        const toZigbee: Tz.Converter[] = [
+            {
+                key: ["camera_active_trigger"],
+                convertSet: async (entity, key, value, meta) => {
+                    // Command ID 0x01: CameraActiveTigger
+                    await entity.command(clusterName, 0x01, {}, {manufacturerCode});
+                    return {state: {[key]: value}};
+                },
+            },
+        ];
+
+        return {
+            exposes,
+            fromZigbee: [],
+            toZigbee,
+            isModernExtend: true,
+        };
+    },
     heimanClusterSensorTestTrigger: (): ModernExtend => {
         const clusterName = "heimanClusterSpecial" as const;
         const manufacturerCode = 0x120b;
@@ -2691,7 +2703,7 @@ export const definitions: DefinitionWithExtend[] = [
                 lookup: {WallMounted: 0, Ceiling: 1, RotateCeiling45: 2},
                 cluster: "heimanClusterRadar",
                 attribute: {ID: 0xf007, type: Zcl.DataType.UINT8},
-                description: "0: Wall-mounted, 1: Ceiling, 2: Rotate ceiling 45°",
+                description: "0: Wall-mounted, 1: Ceiling, 2: Rotate ceiling 45��",
                 access: "ALL",
             }),
         ],
