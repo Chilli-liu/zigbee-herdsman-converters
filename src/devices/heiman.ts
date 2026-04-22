@@ -1474,6 +1474,12 @@ const heimanExtend = {
             e.text("server_url", ea.ALL).withDescription("Current Server URL"),
             e.text("server_url_candidate", ea.ALL).withDescription("Candidate WiFi Server URL"),
         ];
+
+        const fromZigbee = [
+            {
+                cluster: clusterName,
+                type: ["attributeReport", "readResponse"],
+                convert: (model, msg, publish, options, meta) => {
                     const result: Record<string, unknown> = {};
                     const data = msg.data as Record<string, unknown>;
 
