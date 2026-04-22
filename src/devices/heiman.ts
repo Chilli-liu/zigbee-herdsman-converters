@@ -394,7 +394,7 @@ const heimanExtend = {
             e
                 .text("cell_mounted_table", ea.ALL)
                 .withDescription(
-                    "Ceiling installation area coordinate table. Format: 'X1,X2,Y1,Y2,height'. Value range: -2000��X1��0, 0��X2��2000 -2500��Y1��0, 0��Y2��2500 2300��height��3000 Unit:mm",
+                    "Ceiling installation area coordinate table. Format: 'X1,X2,Y1,Y2,height'. Value range: -2000≤X1≤0, 0≤X2≤2000 -2500≤Y1≤0, 0≤Y2≤2500 2300≤height≤3000 Unit:mm",
                 ),
         );
         const fromZigbee = [
@@ -474,7 +474,7 @@ const heimanExtend = {
             e
                 .text("wall_mounted_table", ea.ALL)
                 .withDescription(
-                    "Wall-mounted installation area coordinate table. Format: 'X1,X2,Y2,height' Value range: -2000��X1��0, 0��X2��2000 200��Y2��4000 1500��height��1600  Unit:mm.",
+                    "Wall-mounted installation area coordinate table. Format: 'X1,X2,Y2,height' Value range: -2000≤X1≤0, 0≤X2≤2000 200≤Y2≤4000 1500≤height≤1600  Unit:mm.",
                 ),
         );
         const fromZigbee = [
@@ -549,7 +549,7 @@ const heimanExtend = {
             e
                 .text("sub_region_isolation_table", ea.ALL)
                 .withDescription(
-                    "Undetectable area coordinate table. Format: 'x1,x2,y1,y2,z1,z2'. Ranges: X1��x1��x2��X2 When wall-mounted:  200��y1��y2��Y2 0��z1��z2��2300 Ceiling installation: Y1��y1��y2��Y2 0��z1��z2��height Unit:mm",
+                    "Undetectable area coordinate table. Format: 'x1,x2,y1,y2,z1,z2'. Ranges: X1≤x1≤x2≤X2 When wall-mounted:  200≤y1≤y2≤Y2 0≤z1≤z2≤2300 Ceiling installation: Y1≤y1≤y2≤Y2 0≤z1≤z2≤height Unit:mm",
                 ),
         );
         const fromZigbee = [
@@ -2709,7 +2709,7 @@ export const definitions: DefinitionWithExtend[] = [
                 lookup: {WallMounted: 0, Ceiling: 1, RotateCeiling45: 2},
                 cluster: "heimanClusterRadar",
                 attribute: {ID: 0xf007, type: Zcl.DataType.UINT8},
-                description: "0: Wall-mounted, 1: Ceiling, 2: Rotate ceiling 45��",
+                description: "0: Wall-mounted, 1: Ceiling, 2: Rotate ceiling 45°",
                 access: "ALL",
             }),
         ],
