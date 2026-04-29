@@ -91,6 +91,8 @@ interface HeimanPrivateCluster {
         indicatorLightOnOff: number;
         interconnectable: number;
         smokeUnit: number;
+        remoteSelfTest: number;
+        temperatureOffset: number;
         rebootedCount: number;
         rejoinedCount: number;
         reportedPackages: number;
@@ -212,11 +214,13 @@ const heimanExtend = {
                 indicatorLightLevelControlOf1: {name: "indicatorLightLevelControlOf1", ID: 0x1004, type: Zcl.DataType.UINT8, write: true},
                 indicatorLightLevelControlOf2: {name: "indicatorLightLevelControlOf2", ID: 0x1005, type: Zcl.DataType.UINT8, write: true},
                 indicatorLightLevelControlOf3: {name: "indicatorLightLevelControlOf3", ID: 0x1006, type: Zcl.DataType.UINT8, write: true},
-                interconnectable: {name: "interconnectable", ID: 0x1007, type: Zcl.DataType.UINT8, write: true},
-                indicatorLightOnOff: {name: "indicatorLightOnOff", ID: 0x1008, type: Zcl.DataType.UINT8},
-                rebootedCount: {name: "rebootedCount", ID: 0x1009, type: Zcl.DataType.UINT8},
-                rejoinedCount: {name: "rejoinedCount", ID: 0x100a, type: Zcl.DataType.UINT8},
-                reportedPackages: {name: "reportedPackages", ID: 0x100b, type: Zcl.DataType.UINT8},
+                interconnectable: {name: "interconnectable", ID: 0x1007, type: Zcl.DataType.UINT8},
+                smokeUnit: {name: "smokeUnit", ID: 0x1008, type: Zcl.DataType.UINT8},
+                remoteSelfTest: {name: "remoteSelfTest", ID: 0x1009, type: Zcl.DataType.UINT8},
+                temperatureOffset: {name: "temperatureOffset", ID: 0x100d, type: Zcl.DataType.INT16},
+                rebootedCount: {name: "rebootedCount", ID: 0x0019, type: Zcl.DataType.UINT8},
+                rejoinedCount: {name: "rejoinedCount", ID: 0x001a, type: Zcl.DataType.UINT8},
+                reportedPackages: {name: "reportedPackages", ID: 0x001b, type: Zcl.DataType.UINT8},
 
                 // wifi classes
                 wifiSsid: {name: "wifiSsid", ID: 0x2000, type: Zcl.DataType.CHAR_STR},
@@ -1644,6 +1648,9 @@ const fzLocal = {
                 // Check if valid, then force exactly 2 decimal places as a STRING
                 result.smoke_level = Number.isNaN(raw) ? "0.00" : raw.toFixed(2);
             }
+            if (data.temperatureOffset !== undefined) {
+                result.temperature_offset = data.temperatureOffset;
+            }
             if (data.deviceCascadeState !== undefined) {
                 result.siren_for_automation_only = smokeSirenLookup[data.deviceCascadeState as number];
             }
@@ -2987,9 +2994,13 @@ export const definitions: DefinitionWithExtend[] = [
             await reporting.bind(endpoint, coordinatorEndpoint, ["genPowerCfg", 0xfc90]);
             await reporting.batteryPercentageRemaining(endpoint);
             await endpoint.read("ssIasZone", ["zoneStatus", "zoneState", "iasCieAddr", "zoneId"]);
-            await endpoint.read("heimanClusterSpecial", [0x0002, 0x008, 0x009, 0x1004, 0x1007, 0x0016, 0x0017, 0x0018, 0x0019, 0x001a, 0x001b], {
-                manufacturerCode: Zcl.ManufacturerCode.HEIMAN_TECHNOLOGY_CO_LTD,
-            });
+            await endpoint.read(
+                "heimanClusterSpecial",
+                [0x0002, 0x008, 0x009, 0x1004, 0x1007, 0x0016, 0x0017, 0x0018, 0x0019, 0x001a, 0x001b, 0x100d],
+                {
+                    manufacturerCode: Zcl.ManufacturerCode.HEIMAN_TECHNOLOGY_CO_LTD,
+                },
+            );
         },
         exposes: [],
         extend: [
@@ -3045,6 +3056,16 @@ export const definitions: DefinitionWithExtend[] = [
                 cluster: "heimanClusterSpecial",
                 attribute: {ID: 0x0012, type: Zcl.DataType.ENUM8},
                 description: "siren effect",
+                access: "ALL",
+            }),
+            m.numeric({
+                name: "temperature_offset",
+                unit: "",
+                valueMin: -1500,
+                valueMax: 1500,
+                cluster: "heimanClusterSpecial",
+                attribute: {ID: 0x100d, type: Zcl.DataType.INT16},
+                description: "used for temperature offset, unit: 0.01℃",
                 access: "ALL",
             }),
             m.numeric({
@@ -3313,9 +3334,13 @@ export const definitions: DefinitionWithExtend[] = [
             await reporting.bind(endpoint, coordinatorEndpoint, ["genPowerCfg", 0xfc90]);
             await reporting.batteryPercentageRemaining(endpoint);
             await endpoint.read("ssIasZone", ["zoneStatus", "zoneState", "iasCieAddr", "zoneId"]);
-            await endpoint.read("heimanClusterSpecial", [0x0002, 0x008, 0x009, 0x1004, 0x1007, 0x0016, 0x0017, 0x0018, 0x0019, 0x001a, 0x001b], {
-                manufacturerCode: Zcl.ManufacturerCode.HEIMAN_TECHNOLOGY_CO_LTD,
-            });
+            await endpoint.read(
+                "heimanClusterSpecial",
+                [0x0002, 0x008, 0x009, 0x1004, 0x1007, 0x0016, 0x0017, 0x0018, 0x0019, 0x001a, 0x001b, 0x100d],
+                {
+                    manufacturerCode: Zcl.ManufacturerCode.HEIMAN_TECHNOLOGY_CO_LTD,
+                },
+            );
         },
         exposes: [e.co()],
         extend: [
@@ -3372,6 +3397,16 @@ export const definitions: DefinitionWithExtend[] = [
                 cluster: "heimanClusterSpecial",
                 attribute: {ID: 0x0012, type: Zcl.DataType.ENUM8},
                 description: "siren effect",
+                access: "ALL",
+            }),
+            m.numeric({
+                name: "temperature_offset",
+                unit: "",
+                valueMin: -1500,
+                valueMax: 1500,
+                cluster: "heimanClusterSpecial",
+                attribute: {ID: 0x100d, type: Zcl.DataType.INT16},
+                description: "used for temperature offset, unit: 0.01℃",
                 access: "ALL",
             }),
             m.numeric({
