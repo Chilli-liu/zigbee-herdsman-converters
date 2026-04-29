@@ -215,7 +215,7 @@ const heimanExtend = {
                 indicatorLightLevelControlOf2: {name: "indicatorLightLevelControlOf2", ID: 0x1005, type: Zcl.DataType.UINT8, write: true},
                 indicatorLightLevelControlOf3: {name: "indicatorLightLevelControlOf3", ID: 0x1006, type: Zcl.DataType.UINT8, write: true},
                 interconnectable: {name: "interconnectable", ID: 0x1007, type: Zcl.DataType.UINT8},
-                smokeUnit: {name: "smokeUnit", ID: 0x1008, type: Zcl.DataType.UINT8},
+                indicatorLightOnOff: {name: "indicatorLightOnOff", ID: 0x1008, type: Zcl.DataType.UINT8},
                 remoteSelfTest: {name: "remoteSelfTest", ID: 0x1009, type: Zcl.DataType.UINT8},
                 temperatureOffset: {name: "temperatureOffset", ID: 0x100d, type: Zcl.DataType.INT16},
                 rebootedCount: {name: "rebootedCount", ID: 0x0019, type: Zcl.DataType.UINT8},
